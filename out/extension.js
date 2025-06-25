@@ -65,19 +65,19 @@ function activate(context) {
             vscode.window.showErrorMessage('Current file is not a YAML file');
             return;
         }
-        await validateTektonPipeline(document);
+        await validateTektonPipeline(document, context);
     });
     // Register YAML document open listener for immediate validation
     let yamlOpenListener = vscode.workspace.onDidOpenTextDocument(async (document) => {
         if (document.languageId === 'yaml') {
             console.log('YAML file opened, triggering validation');
-            validateTektonPipeline(document);
+            validateTektonPipeline(document, context);
         }
     });
     context.subscriptions.push(testDisposable, validateDisposable, yamlOpenListener);
     console.log('Tekton Validator extension activation completed');
 }
-async function validateTektonPipeline(document) {
+async function validateTektonPipeline(document, context) {
     console.log('validateTektonPipeline called for document:', document.fileName);
     try {
         // Check if the document contains Tekton resources
@@ -102,9 +102,35 @@ async function validateTektonPipeline(document) {
             return; // Not a Tekton file, skip validation
         }
         console.log('Tekton resources found, proceeding with validation');
-        // Get tektor path from configuration
+        // Get tektor path - try bundled binary first, then user configuration
         const config = vscode.workspace.getConfiguration('tektonValidator');
-        const tektorPath = config.get('tektorPath', '/Users/bcook/go/bin/tektor');
+        let tektorPath = config.get('tektorPath', '');
+        if (!tektorPath) {
+            // Use bundled binary based on platform
+            const platform = process.platform;
+            const arch = process.arch;
+            let binaryName = 'tektor';
+            if (platform === 'darwin') {
+                if (arch === 'arm64') {
+                    binaryName = 'darwin-arm64/tektor';
+                }
+                else {
+                    binaryName = 'darwin-x64/tektor';
+                }
+            }
+            else if (platform === 'linux') {
+                if (arch === 'arm64') {
+                    binaryName = 'linux-arm64/tektor';
+                }
+                else {
+                    binaryName = 'linux-x64/tektor';
+                }
+            }
+            else if (platform === 'win32') {
+                binaryName = 'win32-x64/tektor.exe';
+            }
+            tektorPath = path.join(context.extensionPath, 'binaries', binaryName);
+        }
         console.log('Using tektor path:', tektorPath);
         // Create a temporary file for validation
         const tempFile = path.join(os.tmpdir(), `tekton-${Date.now()}.yaml`);

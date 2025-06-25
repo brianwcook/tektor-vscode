@@ -31,8 +31,8 @@
       "properties": {
         "tektonValidator.tektorPath": {
           "type": "string",
-          "default": "/Users/bcook/go/bin/tektor",
-          "description": "Path to the tektor executable"
+          "default": "",
+          "description": "Path to the tektor executable (leave empty to use bundled binary)"
         }
       }
     }
