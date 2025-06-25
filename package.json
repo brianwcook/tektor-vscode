@@ -1,0 +1,52 @@
+{
+  "name": "vscode-tekton-validator",
+  "displayName": "Tekton Pipeline Validator",
+  "description": "Validate Tekton YAML pipelines using tektor",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "tektonValidator.validatePipeline",
+        "title": "Tekton: Validate Pipeline",
+        "category": "Tekton"
+      },
+      {
+        "command": "tektonValidator.test",
+        "title": "Tekton: Test Extension",
+        "category": "Tekton"
+      }
+    ],
+    "configuration": {
+      "title": "Tekton Validator",
+      "properties": {
+        "tektonValidator.tektorPath": {
+          "type": "string",
+          "default": "/Users/bcook/go/bin/tektor",
+          "description": "Path to the tektor executable"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "16.x",
+    "@types/vscode": "^1.74.0",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "js-yaml": "^4.1.0"
+  }
+}

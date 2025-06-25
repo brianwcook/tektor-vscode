@@ -1,0 +1,9 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: task-ref-error
+spec:
+  tasks:
+    - name: build
+      taskRef:
+        name: completely-fake-task-name
